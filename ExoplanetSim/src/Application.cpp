@@ -278,6 +278,7 @@ void Application::run() {
         static float starMass = star->getMass();
         static float starRadius = star->getRadius();
         static float starTemperature = star->getEffectiveTemperature();
+        static float luminosity = star->getLuminosity();
 
         if (ImGui::SliderFloat("Mass", &starMass, 0.1f, 10.0f, "%.2f")) {
             star->setMass(starMass);
@@ -291,6 +292,9 @@ void Application::run() {
             star->setEffectiveTemperature(starTemperature);
         }
 
+        if (ImGui::SliderFloat("Luminosity", &luminosity, 1000.0f, 100000.0f, "%.0f")) {
+            star->setLuminosity(luminosity);
+        }
         ImGui::End();
 
         // Planet Parameters Window
