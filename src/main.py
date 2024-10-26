@@ -7,9 +7,9 @@ window_width, window_height = 1200, 800
 window = pygame.display.set_mode((window_width, window_height))
 pygame.display.set_caption("Habitable Exoplanet Simulation")
 
-width = window_width/5
+width = window_width/8
 height = window_height/25
-dist = parameter(window, window_width/10, window_height/10, width, height, 10)
+dist = parameter(window, window_width/10, window_height/10, width, height, 16, "Planet Distance")
 params={dist}
 
 circle_color = (0, 128, 255)
