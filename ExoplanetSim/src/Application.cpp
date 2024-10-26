@@ -338,8 +338,8 @@ void Application::run() {
         ImGuiIO &io = ImGui::GetIO();
 
         // Create a new ImGui window at the bottom of the screen
-        ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - 50));
-        ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, 50));
+        ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - 80)); // Increased height for popup
+        ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, 80));
 
         ImGui::Begin("Camera Controls", nullptr,
                      ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -358,8 +358,8 @@ void Application::run() {
         // Center the buttons
         float buttonWidth = 120.0f; // Adjust as needed
         // Updated totalButtonWidth to account for additional buttons
-        float totalButtonWidth = buttonWidth * 7 + ImGui::GetStyle().ItemSpacing.x *
-                                                       6; // 7 buttons with 6 spaces
+        float totalButtonWidth = buttonWidth * 5 + ImGui::GetStyle().ItemSpacing.x *
+                                                       4; // 5 buttons with 4 spaces
         float windowWidth = io.DisplaySize.x;
         float startX = (windowWidth - totalButtonWidth) / 2.0f;
 
@@ -382,18 +382,17 @@ void Application::run() {
                 !showSeparateWindow; // Toggle the window's visibility
         }
 
-        // New Buttons for Images
         ImGui::SameLine();
-        if (ImGui::Button("Show Image 1", ImVec2(buttonWidth, 0))) {
-            showImage1 = !showImage1; // Toggle Image 1 window
+        if (ImGui::Button("Show Graphs", ImVec2(buttonWidth, 0))) {
+            ImGui::OpenPopup("Image Selection");
         }
-        ImGui::SameLine();
-        if (ImGui::Button("Show Image 2", ImVec2(buttonWidth, 0))) {
-            showImage2 = !showImage2; // Toggle Image 2 window
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Show Image 3", ImVec2(buttonWidth, 0))) {
-            showImage3 = !showImage3; // Toggle Image 3 window
+
+        if (ImGui::BeginPopup("Image Selection")) {
+            // Use ImGui::MenuItem with checkboxes
+            ImGui::MenuItem("Image 1", NULL, &showImage1);
+            ImGui::MenuItem("Image 2", NULL, &showImage2);
+            ImGui::MenuItem("Image 3", NULL, &showImage3);
+            ImGui::EndPopup();
         }
 
         ImGui::PopStyleColor(3);
@@ -420,7 +419,7 @@ void Application::run() {
                 "life.");
 
             ImGui::Separator();
-            ImGui::Text("Further details or controls can be placed here.");
+            ImGui::Text("-----------------------------------");
 
             ImGui::End();
         }
@@ -433,7 +432,7 @@ void Application::run() {
             ImGui::Text("Displaying Image 1:");
             // Ensure the texture is loaded
             if (imageTexture1 != 0) {
-                // Adjust the size as needed
+                // Use default UVs (no flipping)
                 ImGui::Image((ImTextureID)(uintptr_t)imageTexture1, ImVec2(400, 300), ImVec2(0,1), ImVec2(1,0));
             } else {
                 ImGui::Text("Failed to load Image 1.");
@@ -489,7 +488,6 @@ void Application::run() {
         glfwPollEvents();
     }
 }
-
 void Application::update() {
     // Update objects
     planet->update(deltaTime);
