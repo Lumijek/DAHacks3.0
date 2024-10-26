@@ -389,9 +389,9 @@ void Application::run() {
 
         if (ImGui::BeginPopup("Image Selection")) {
             // Use ImGui::MenuItem with checkboxes
-            ImGui::MenuItem("Image 1", NULL, &showImage1);
-            ImGui::MenuItem("Image 2", NULL, &showImage2);
-            ImGui::MenuItem("Image 3", NULL, &showImage3);
+            ImGui::MenuItem("Metallicity vs Stellar Mass", NULL, &showImage1);
+            ImGui::MenuItem("Orbital Distance vs Orbital Phase", NULL, &showImage2);
+            ImGui::MenuItem("Stellar Flux vs Orbital Phase", NULL, &showImage3);
             ImGui::EndPopup();
         }
 
@@ -419,51 +419,51 @@ void Application::run() {
                 "life.");
 
             ImGui::Separator();
-            ImGui::Text("-----------------------------------");
+            ImGui::Text("-----------------------------------_");
 
             ImGui::End();
         }
 
         // Separate Image Windows
         if (showImage1) {
-            ImGui::Begin("Image 1", &showImage1,
+            ImGui::Begin("Graph 1", &showImage1,
                          ImGuiWindowFlags_AlwaysAutoResize);
 
-            ImGui::Text("Displaying Image 1:");
+            ImGui::Text("Displaying Graph 1:");
             // Ensure the texture is loaded
             if (imageTexture1 != 0) {
                 // Use default UVs (no flipping)
                 ImGui::Image((ImTextureID)(uintptr_t)imageTexture1, ImVec2(400, 300), ImVec2(0,1), ImVec2(1,0));
             } else {
-                ImGui::Text("Failed to load Image 1.");
+                ImGui::Text("Failed to load Graph 1.");
             }
 
             ImGui::End();
         }
 
         if (showImage2) {
-            ImGui::Begin("Image 2", &showImage2,
+            ImGui::Begin("Graph 2", &showImage2,
                          ImGuiWindowFlags_AlwaysAutoResize);
 
-            ImGui::Text("Displaying Image 2:");
+            ImGui::Text("Displaying Graph 2:");
             if (imageTexture2 != 0) {
                 ImGui::Image((ImTextureID)(uintptr_t)imageTexture2, ImVec2(400, 300), ImVec2(0,1), ImVec2(1,0));
             } else {
-                ImGui::Text("Failed to load Image 2.");
+                ImGui::Text("Failed to load Graph 2.");
             }
 
             ImGui::End();
         }
 
         if (showImage3) {
-            ImGui::Begin("Image 3", &showImage3,
+            ImGui::Begin("Graph 3", &showImage3,
                          ImGuiWindowFlags_AlwaysAutoResize);
 
-            ImGui::Text("Displaying Image 3:");
+            ImGui::Text("Displaying Graph 3:");
             if (imageTexture3 != 0) {
                 ImGui::Image((ImTextureID)(uintptr_t)imageTexture3, ImVec2(400, 300), ImVec2(0,1), ImVec2(1,0));
             } else {
-                ImGui::Text("Failed to load Image 3.");
+                ImGui::Text("Failed to load Graph 3.");
             }
 
             ImGui::End();
