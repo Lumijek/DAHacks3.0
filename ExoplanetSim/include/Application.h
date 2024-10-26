@@ -18,6 +18,11 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
+// Include stb_image
+#include "stb_image.h"
+
+#include <cstdint> // For uintptr_t
+
 class Application {
 public:
     Application();
@@ -41,8 +46,8 @@ public:
     bool firstMouse;
     bool cursorEnabled; // True if cursor is visible
 
-    // New state variable for the separate window
-    bool showSeparateWindow; // Add this line
+    // State variable for the separate window
+    bool showSeparateWindow;
 
 private:
     // Timing variables
@@ -77,6 +82,19 @@ private:
     void adjustCameraPosition();    // View entire solar system
     void adjustCameraToPlanet();    // Focus on planet
     void adjustCameraToStar();      // Focus on star
+
+    // Function to load a texture from file
+    GLuint loadTexture(const char* path);
+
+    // Texture IDs for images
+    GLuint imageTexture1;
+    GLuint imageTexture2;
+    GLuint imageTexture3;
+
+    // State variables for image windows
+    bool showImage1;
+    bool showImage2;
+    bool showImage3;
 
     // Friend classes and functions for access
     friend class InputHandler;
