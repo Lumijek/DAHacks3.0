@@ -1,4 +1,0 @@
-/Users/aayush/Documents/ExoplanetSimulation/build/CMakeFiles/imgui.dir
-/Users/aayush/Documents/ExoplanetSimulation/build/CMakeFiles/ExoplanetSimulation.dir
-/Users/aayush/Documents/ExoplanetSimulation/build/CMakeFiles/edit_cache.dir
-/Users/aayush/Documents/ExoplanetSimulation/build/CMakeFiles/rebuild_cache.dir

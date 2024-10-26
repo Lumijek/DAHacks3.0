@@ -42,16 +42,13 @@ Star::~Star() {
     glDeleteTextures(1, &textureID);
 }
 
-void Star::render(const Shader& shader) {
+void Star::render(const Shader& shader, const glm::mat4& model) {
     // Bind the texture
     glActiveTexture(GL_TEXTURE0); // Activate texture unit 0
     glBindTexture(GL_TEXTURE_2D, textureID);
     shader.setInt("starTexture", 0); // Set the sampler to texture unit 0
 
     // Set model matrix
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, position);
-    model = glm::scale(model, glm::vec3(radius)); // Scale based on the star's radius
     shader.setMat4("model", model);
 
     // Calculate color from temperature

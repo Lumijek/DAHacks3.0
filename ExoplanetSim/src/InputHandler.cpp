@@ -2,6 +2,7 @@
 
 #include "InputHandler.h"
 #include "Application.h"
+#include "Camera.h" // Include Camera.h to access Camera::Camera_Movement enum
 #include <iostream>
 
 // Initialize the static instance pointer
@@ -52,13 +53,17 @@ void InputHandler::processInput(GLFWwindow* window)
             glfwSetWindowShouldClose(window, true);
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            app->camera.ProcessKeyboard(FORWARD, app->deltaTime);
+            app->camera.ProcessKeyboard(Camera::FORWARD, app->deltaTime);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            app->camera.ProcessKeyboard(BACKWARD, app->deltaTime);
+            app->camera.ProcessKeyboard(Camera::BACKWARD, app->deltaTime);
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            app->camera.ProcessKeyboard(LEFT, app->deltaTime);
+            app->camera.ProcessKeyboard(Camera::LEFT, app->deltaTime);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            app->camera.ProcessKeyboard(RIGHT, app->deltaTime);
+            app->camera.ProcessKeyboard(Camera::RIGHT, app->deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+            app->camera.ProcessKeyboard(Camera::DOWN, app->deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+            app->camera.ProcessKeyboard(Camera::UP, app->deltaTime);
     }
 }
 

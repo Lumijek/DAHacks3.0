@@ -1,8 +1,8 @@
 // Application.cpp
 
 #include "Application.h"
-#include "InputHandler.h"
 #include "Renderer.h"
+#include "InputHandler.h"
 
 #include <iostream>
 
@@ -14,7 +14,7 @@ Application::Application()
       lastX(SCR_WIDTH / 2.0f),
       lastY(SCR_HEIGHT / 2.0f),
       firstMouse(true),
-      cursorEnabled(false), // Cursor is hidden by default
+      cursorEnabled(false),
       skybox(nullptr),
       star(nullptr),
       planet(nullptr),
@@ -28,37 +28,34 @@ Application::Application()
 
 Application::~Application()
 {
-    // Cleanup ImGui
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    // Cleanup GLFW
-    glfwTerminate();
-
-    // Delete dynamically allocated objects
+    // Cleanup
     delete skybox;
     delete star;
     delete planet;
+
     delete starShader;
     delete planetShader;
     delete skyboxShader;
     delete orbitShader;
+
+    // Shutdown ImGui
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    // Terminate GLFW
+    glfwTerminate();
 }
 
 bool Application::initialize()
 {
     if (!initWindow())
         return false;
-
     if (!initOpenGL())
         return false;
-
     initObjects();
-
     if (!initImGui())
         return false;
-
     return true;
 }
 
@@ -66,11 +63,11 @@ bool Application::initWindow()
 {
     // Initialize GLFW
     if (!glfwInit()) {
-        std::cerr << "Error: GLFW initialization failed." << std::endl;
+        std::cerr << "Error: Failed to initialize GLFW." << std::endl;
         return false;
     }
 
-    // Configure GLFW
+    // Set OpenGL version and profile
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -165,6 +162,9 @@ void Application::initObjects()
         glm::vec3(0.2f, 0.5f, 0.8f),   // Planet Color
         "../textures/planet.jpg"       // Texture Path
     );
+
+    // Adjust the camera position based on initial orbital parameters
+    adjustCameraPosition();
 }
 
 bool Application::initImGui()
@@ -219,6 +219,7 @@ void Application::run()
         }
         if (ImGui::SliderFloat("Radius", &starRadius, 0.1f, 5.0f, "%.2f")) {
             star->setRadius(starRadius);
+            adjustCameraPosition(); // Adjust camera if star size changes
         }
         if (ImGui::SliderFloat("Temperature", &starTemperature, 1000.0f, 40000.0f, "%.0f K")) {
             star->setEffectiveTemperature(starTemperature);
@@ -235,6 +236,8 @@ void Application::run()
         static float planetOrbitalDistance = planet->getOrbitalDistance();
         static float planetOrbitalPeriod = planet->getOrbitalPeriod();
 
+        bool orbitalParametersChanged = false;
+
         if (ImGui::SliderFloat("Mass", &planetMass, 0.0001f, 0.1f, "%.5f")) {
             planet->setMass(planetMass);
         }
@@ -243,13 +246,68 @@ void Application::run()
         }
         if (ImGui::SliderFloat("Eccentricity", &planetEccentricity, 0.0f, 0.99f, "%.2f")) {
             planet->setEccentricity(planetEccentricity);
+            orbitalParametersChanged = true;
         }
-        if (ImGui::SliderFloat("Orbital Distance", &planetOrbitalDistance, 1.0f, 20.0f, "%.2f AU")) {
+        if (ImGui::SliderFloat("Orbital Distance", &planetOrbitalDistance, 1.0f, 1000.0f, "%.2f AU")) {
             planet->setOrbitalDistance(planetOrbitalDistance);
+            orbitalParametersChanged = true;
         }
-        if (ImGui::SliderFloat("Orbital Period", &planetOrbitalPeriod, 1.0f, 365.0f, "%.1f days")) {
+        if (ImGui::SliderFloat("Orbital Period", &planetOrbitalPeriod, 1.0f, 1000.0f, "%.1f days")) {
             planet->setOrbitalPeriod(planetOrbitalPeriod);
+            // If orbital period affects distance, set orbitalParametersChanged = true
+            // orbitalParametersChanged = true;
         }
+
+        ImGui::End();
+
+        // Adjust camera position if orbital parameters have changed
+        if (orbitalParametersChanged) {
+            adjustCameraPosition();
+        }
+
+        // Camera Controls at the bottom
+        ImGuiIO& io = ImGui::GetIO();
+
+        // Create a new ImGui window at the bottom of the screen
+        ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - 50));
+        ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, 50));
+
+        ImGui::Begin("Camera Controls", nullptr,
+            ImGuiWindowFlags_NoTitleBar |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoScrollbar |
+            ImGuiWindowFlags_NoSavedSettings |
+            ImGuiWindowFlags_NoBackground);
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0)); // Transparent background
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1, 1, 1, 0.1f)); // Slight highlight on hover
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1, 1, 1, 0.2f)); // Slight highlight when pressed
+
+        // Center the buttons
+        float buttonWidth = 120.0f; // Adjust as needed
+        float totalButtonWidth = buttonWidth * 3 + ImGui::GetStyle().ItemSpacing.x * 2;
+        float windowWidth = io.DisplaySize.x;
+        float startX = (windowWidth - totalButtonWidth) / 2.0f;
+
+        ImGui::SetCursorPosX(startX);
+
+        if (ImGui::Button("Planet View", ImVec2(buttonWidth, 0)))
+        {
+            adjustCameraToPlanet();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Star View", ImVec2(buttonWidth, 0)))
+        {
+            adjustCameraToStar();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("System View", ImVec2(buttonWidth, 0)))
+        {
+            adjustCameraPosition();
+        }
+
+        ImGui::PopStyleColor(3);
 
         ImGui::End();
 
@@ -278,4 +336,62 @@ void Application::update()
     // Update objects
     planet->update(deltaTime);
     star->update(deltaTime);
+}
+
+void Application::adjustCameraPosition()
+{
+    // Calculate the maximum distance the planet can be from the star
+    float maxDistance = planet->getOrbitalDistance() * (1.0f + planet->getEccentricity());
+
+    // Include the star's radius in the calculation
+    float starRadius = star->getRadius();
+
+    // Calculate a suitable camera distance
+    float distanceFactor = 2.5f; // Adjust this factor as needed
+    float cameraDistance = (maxDistance + starRadius) * distanceFactor;
+
+    // Position the camera along a suitable vector
+    glm::vec3 newPosition = glm::vec3(0.0f, cameraDistance, cameraDistance);
+
+    // Calculate the new front vector
+    glm::vec3 newFront = star->getPosition() - newPosition;
+
+    // Set the camera's position and front vectors using the Camera method
+    camera.setPositionAndFront(newPosition, newFront);
+}
+
+void Application::adjustCameraToPlanet()
+{
+    // Position the camera directly in front of the planet
+    float offsetDistance = planet->getRadius() * 3.0f; // Adjust multiplier as needed
+
+    // Calculate direction from the planet to the star (or any other point)
+    glm::vec3 direction = glm::normalize(planet->getPosition() - star->getPosition());
+
+    // Calculate new camera position behind the planet
+    glm::vec3 newPosition = planet->getPosition() + direction * offsetDistance;
+
+    // Calculate new front vector
+    glm::vec3 newFront = planet->getPosition() - newPosition;
+
+    // Set the camera's position and front vectors using the Camera method
+    camera.setPositionAndFront(newPosition, newFront);
+}
+
+void Application::adjustCameraToStar()
+{
+    // Position the camera directly in front of the star
+    float offsetDistance = star->getRadius() * 3.0f; // Adjust multiplier as needed
+
+    // Calculate direction to position the camera
+    glm::vec3 direction = glm::vec3(0.0f, 0.0f, 1.0f); // Adjust if needed
+
+    // Calculate new camera position
+    glm::vec3 newPosition = star->getPosition() + direction * offsetDistance;
+
+    // Calculate new front vector
+    glm::vec3 newFront = star->getPosition() - newPosition;
+
+    // Set the camera's position and front vectors using the Camera method
+    camera.setPositionAndFront(newPosition, newFront);
 }

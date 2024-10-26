@@ -14,6 +14,23 @@ void Renderer::renderScene(float deltaTime)
     glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // Dark background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Calculate the maximum distance in the scene
+    float maxPlanetDistance = app->planet->getOrbitalDistance() * (1.0f + app->planet->getEccentricity());
+    float starRadius = app->star->getRadius();
+
+    // Calculate a suitable far plane distance
+    float maxDistance = (maxPlanetDistance + starRadius) * 2.5f;
+
+    // Set near and far clipping planes
+    float nearPlane = 1.0f;                   // Increase near plane for better depth precision
+    float farPlane = maxDistance * 5.0f;      // Ensure farPlane is larger than maxDistance
+
+    // Prevent nearPlane from being greater than or equal to farPlane
+    if (nearPlane >= farPlane)
+    {
+        nearPlane = farPlane / 1000.0f; // Adjust nearPlane accordingly
+    }
+
     // Set view and projection matrices
     glm::mat4 view = app->camera.GetViewMatrix();
     int width, height;
@@ -21,19 +38,22 @@ void Renderer::renderScene(float deltaTime)
     glm::mat4 projection = glm::perspective(
         glm::radians(app->camera.Zoom),
         static_cast<float>(width) / static_cast<float>(height),
-        0.1f,
-        100.0f
+        nearPlane,
+        farPlane
     );
 
     // Render the star
     app->starShader->use();
     app->starShader->setMat4("view", view);
     app->starShader->setMat4("projection", projection);
+    app->starShader->setVec3("cameraPos", app->camera.Position);
+
+    // Render the star (first pass)
     glm::mat4 starModel = glm::mat4(1.0f);
     starModel = glm::translate(starModel, app->star->getPosition());
     starModel = glm::scale(starModel, glm::vec3(app->star->getRadius()));
-    app->starShader->setMat4("model", starModel);
-    app->star->render(*app->starShader);
+
+    app->star->render(*app->starShader, starModel);
 
     // Render the planet
     app->planetShader->use();

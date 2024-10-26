@@ -30,7 +30,7 @@ public:
     Camera camera;
     float deltaTime;
 
-    // Screen settings (move these before lastX and lastY)
+    // Screen settings
     const unsigned int SCR_WIDTH = 1280;
     const unsigned int SCR_HEIGHT = 720;
 
@@ -66,6 +66,11 @@ private:
 
     // Main loop functions
     void update();
+
+    // Camera adjustment methods
+    void adjustCameraPosition();    // View entire solar system
+    void adjustCameraToPlanet();    // Focus on planet
+    void adjustCameraToStar();      // Focus on star
 
     // Friend classes and functions for access
     friend class InputHandler;

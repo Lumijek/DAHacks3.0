@@ -29,7 +29,7 @@ public:
     ~Star();
 
     // Render the star
-    void render(const Shader& shader);
+    void render(const Shader& shader, const glm::mat4& model);
 
     // Update the star's position based on motion
     void update(float deltaTime);
