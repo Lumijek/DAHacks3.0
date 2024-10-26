@@ -11,6 +11,7 @@
 #include "Star.h"
 #include "Planet.h"
 #include "Shader.h"
+#include "HabitableZone.h" // Include HabitableZone
 
 // ImGui includes
 #include "imgui.h"
@@ -40,6 +41,9 @@ public:
     bool firstMouse;
     bool cursorEnabled; // True if cursor is visible
 
+    // New state variable for the separate window
+    bool showSeparateWindow; // Add this line
+
 private:
     // Timing variables
     float lastFrame;
@@ -48,12 +52,14 @@ private:
     Skybox* skybox;
     Star* star;
     Planet* planet;
+    HabitableZone* habitableZone; // Add HabitableZone
 
     // Shaders
     Shader* starShader;
     Shader* planetShader;
     Shader* skyboxShader;
     Shader* orbitShader;
+    Shader* habitableZoneShader; // Shader for HabitableZone
 
     // ImGui
     ImGuiIO* io;

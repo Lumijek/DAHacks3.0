@@ -6,6 +6,8 @@
 Renderer::Renderer(Application* app)
     : app(app)
 {
+    // Initialize habitableZone pointer
+    habitableZone = app->habitableZone;
 }
 
 void Renderer::renderScene(float deltaTime)
@@ -22,7 +24,7 @@ void Renderer::renderScene(float deltaTime)
     float maxDistance = (maxPlanetDistance + starRadius) * 2.5f;
 
     // Set near and far clipping planes
-    float nearPlane = 1.0f;                   // Increase near plane for better depth precision
+    float nearPlane = 0.1f;                   // Adjusted for better depth precision
     float farPlane = maxDistance * 5.0f;      // Ensure farPlane is larger than maxDistance
 
     // Prevent nearPlane from being greater than or equal to farPlane
@@ -74,10 +76,13 @@ void Renderer::renderScene(float deltaTime)
     app->orbitShader->setMat4("projection", projection);
     app->planet->renderOrbit(*app->orbitShader, view, projection);
 
+    // Render the habitable zone
+    habitableZone->Draw(view, projection);
+
     // Render the skybox last
     glDepthFunc(GL_LEQUAL);
     app->skyboxShader->use();
-    glm::mat4 skyboxView = glm::mat4(glm::mat3(view));
+    glm::mat4 skyboxView = glm::mat4(glm::mat3(view)); // Remove translation from the view matrix
     app->skyboxShader->setMat4("view", skyboxView);
     app->skyboxShader->setMat4("projection", projection);
     app->skybox->render();

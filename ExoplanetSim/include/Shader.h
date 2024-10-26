@@ -1,9 +1,11 @@
+// Shader.h
+
 #ifndef SHADER_H
 #define SHADER_H
 
 #include <glad/glad.h>
 
-#include <glm/glm.hpp>  // Add this line to include GLM types
+#include <glm/glm.hpp>  // Include GLM types
 
 #include <string>
 #include <fstream>
@@ -32,6 +34,9 @@ public:
     // Overloaded functions for setting uniforms with glm types
     void setMat4(const std::string &name, const glm::mat4 &mat) const;
     void setVec3(const std::string &name, const glm::vec3 &value) const;
+
+    // Add the setVec4 method
+    void setVec4(const std::string &name, const glm::vec4 &value) const;
 };
 
 #endif // SHADER_H

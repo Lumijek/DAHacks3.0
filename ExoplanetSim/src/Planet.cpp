@@ -15,6 +15,7 @@ Planet::Planet(
     float eccentricity,
     float orbitalDistance,
     float orbitalPeriod,
+    float semiMajorAxis,
     const std::string& planetType,
     const glm::vec3& orbitCenter,
     const glm::vec3& planetColor,
@@ -25,6 +26,7 @@ Planet::Planet(
     eccentricity(eccentricity),
     orbitalDistance(orbitalDistance),
     orbitalPeriod(orbitalPeriod),
+    semiMajorAxis(semiMajorAxis),
     planetType(planetType),
     orbitCenter(orbitCenter),
     planetColor(planetColor),
@@ -195,6 +197,12 @@ void Planet::setOrbitalPeriod(float period) {
 }
 float Planet::getOrbitalPeriod() const { return orbitalPeriod; }
 
+void Planet::setSemiMajorAxis(float sma) {
+    this->semiMajorAxis = sma;
+}
+float Planet::getSemiMajorAxis() const {
+    return semiMajorAxis;
+}
 void Planet::setPlanetType(const std::string& type) { this->planetType = type; }
 std::string Planet::getPlanetType() const { return planetType; }
 

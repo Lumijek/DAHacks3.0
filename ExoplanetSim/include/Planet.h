@@ -19,6 +19,7 @@ public:
         float eccentricity,
         float orbitalDistance,
         float orbitalPeriod,
+        float semiMajorAxis,
         const std::string& planetType,
         const glm::vec3& orbitCenter,
         const glm::vec3& planetColor,
@@ -52,6 +53,9 @@ public:
     void setOrbitalPeriod(float period);
     float getOrbitalPeriod() const;
 
+    void setSemiMajorAxis(float sma);
+    float getSemiMajorAxis() const;
+
     void setPlanetType(const std::string& type);
     std::string getPlanetType() const;
 
@@ -72,6 +76,7 @@ private:
     float eccentricity;
     float orbitalDistance;
     float orbitalPeriod;
+    float semiMajorAxis;
     std::string planetType;
 
     glm::vec3 orbitCenter;

@@ -19,6 +19,8 @@ set(SOURCES
     src/Star.cpp
     src/Planet.cpp
     src/SphereMesh.cpp
+    src/HabitableZone.cpp
+    src/RingMesh.cpp
 )
 
 # Find GLFW using pkg-config
