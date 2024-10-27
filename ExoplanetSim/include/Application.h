@@ -75,6 +75,16 @@ private:
     // Friend classes and functions for access
     friend class InputHandler;
     friend class Renderer;
+
+    // Image stuff
+    std::vector<GLuint> imageTextures;
+    std::vector<ImVec2> imageSizes;
+    int currentImageIndex = 0;
+    void loadImages();  
+    void loadImage(const std::string& path); // Declaration
+    std::vector<std::string> imagePaths;     // Store paths for comparison
+    void generatePlots();
+
 };
 
 #endif // APPLICATION_H

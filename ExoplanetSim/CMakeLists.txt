@@ -87,3 +87,5 @@ target_link_libraries(${PROJECT_NAME}
     imgui
     ${COMMON_LIBRARIES}
 )
+
+include_directories("/usr/local/include") 

@@ -3,6 +3,8 @@
 #include "Application.h"
 #include "Renderer.h"
 #include "InputHandler.h"
+#include "stb_image.h"
+#include "Charts.h"
 
 #include <iostream>
 
@@ -167,6 +169,76 @@ void Application::initObjects()
     adjustCameraPosition();
 }
 
+void Application::generatePlots() {
+    // Clear existing image paths and generate updated plots
+    imagePaths.clear();
+
+    Charts::gvmass(star->getRadius(), "gvmass");
+    imagePaths.push_back("temp_images/gvmass.png");
+
+    Charts::radvmass(star->getMass(), "radvmass");
+    imagePaths.push_back("temp_images/radvmass.png");
+
+    Charts::luminosityvrad(star->getRadius(), star->getEffectiveTemperature(), "luminosityvrad");
+    imagePaths.push_back("temp_images/luminosityvrad.png");
+
+    Charts::tempvrad(star->getMass(), "tempvrad");
+    imagePaths.push_back("temp_images/tempvrad.png");
+
+    Charts::metalvmass(star->getMass(), "metalvmass");
+    imagePaths.push_back("temp_images/metalvmass.png");
+}
+
+void Application::loadImages() {
+    std::vector<std::string> imagePaths = {
+        "../textures/image1.png",
+        "../textures/image2.png",
+        "../textures/image3.png" // Add more images here
+    };
+
+    for (const auto& path : imagePaths) {
+        int width, height, channels;
+        unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 4);
+        if (!data) {
+            std::cerr << "Failed to load texture: " << path << std::endl;
+            continue;
+        }
+
+        GLuint textureID;
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        stbi_image_free(data); // Free the image memory
+
+        imageTextures.push_back(textureID);
+        imageSizes.push_back(ImVec2(width, height));
+    }
+}
+
+void Application::loadImage(const std::string& path) {
+    int width, height, channels;
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 4);
+    if (!data) {
+        std::cerr << "Failed to load texture: " << path << std::endl;
+        return;
+    }
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data); // Free the image memory
+
+    // Add to the vector
+    imageTextures.push_back(textureID);
+    imageSizes.push_back(ImVec2(width, height));
+    imagePaths.push_back(path); // Track the loaded image path
+}
+
 bool Application::initImGui()
 {
     // Initialize ImGui
@@ -181,6 +253,8 @@ bool Application::initImGui()
     // Initialize ImGui backends
     ImGui_ImplGlfw_InitForOpenGL(window, false); // Install callbacks manually
     ImGui_ImplOpenGL3_Init("#version 330 core");
+
+    loadImages()
 
     return true;
 }
@@ -256,6 +330,34 @@ void Application::run()
             planet->setOrbitalPeriod(planetOrbitalPeriod);
             // If orbital period affects distance, set orbitalParametersChanged = true
             // orbitalParametersChanged = true;
+        }
+
+        ImGui::End();
+
+        generatePlots();
+
+        // Graphical Analysis Window with Image Pagination
+        ImGui::Begin("Graphical Analysis");
+
+        // Check if there are images to display
+        if (!imageTextures.empty()) {
+            // Navigation buttons
+            if (ImGui::ArrowButton("##left", ImGuiDir_Left)) {
+                currentImageIndex = (currentImageIndex - 1 + imageTextures.size()) % imageTextures.size();
+            }
+            ImGui::SameLine();
+            ImGui::Text("Image %d/%d", currentImageIndex + 1, static_cast<int>(imageTextures.size()));
+            ImGui::SameLine();
+            if (ImGui::ArrowButton("##right", ImGuiDir_Right)) {
+                currentImageIndex = (currentImageIndex + 1) % imageTextures.size();
+            }
+
+            // Display the current image
+            GLuint currentTexture = imageTextures[currentImageIndex];
+            ImVec2 currentSize = imageSizes[currentImageIndex];
+            ImGui::Image((ImTextureID)(intptr_t)currentTexture, currentSize);
+        } else {
+            ImGui::Text("No images loaded.");
         }
 
         ImGui::End();
